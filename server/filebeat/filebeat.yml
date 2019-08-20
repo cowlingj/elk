@@ -1,0 +1,14 @@
+filebeat:
+  config.modules:
+    enabled: true
+    path: ${path.config}/modules.d/*.yml
+  inputs:
+    - type: log
+      paths:
+        - /var/log/goserver/*.log
+output:
+  elasticsearch:
+    enabled: false
+  logstash:
+    hosts:
+      - logstash-service:80

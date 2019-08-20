@@ -39,6 +39,6 @@ spec:
   selector:
     app: kibana
   ports:
-    - nodePort: 30002
+    - nodePort: 30003
       port: 80
       targetPort: 5601

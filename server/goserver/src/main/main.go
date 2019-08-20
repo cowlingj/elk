@@ -6,6 +6,7 @@ import (
   "os"
 	"strconv"
 	"math/rand"
+	"log"
 )
 
 func main() {
@@ -16,11 +17,23 @@ func main() {
 		panic("SUCCESS_RATE has not been set")
 	}
 
+	logfile, logfileErr := os.Create("/var/log/goserver/goserver.log")
+
+	if (logfileErr != nil) {
+		panic(logfileErr)
+	}
+
+	logger := log.New(logfile, "goserver", log.LstdFlags)
+
 	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 
+		logger.Println("got request")
+
 		if (rand.Float64() < successRate) {
 			w.WriteHeader(http.StatusOK)
+
+			logger.Println("success")
 
 			body, _ := json.Marshal(struct {
 				Value string `json:"value"`
@@ -32,6 +45,8 @@ func main() {
 
 		} else {
 			w.WriteHeader(http.StatusInternalServerError)
+
+			logger.Println("failure")
 
 			body, _ := json.Marshal(struct {
 				Value string `json:"value"`

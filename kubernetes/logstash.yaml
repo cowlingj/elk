@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: logstash
+spec:
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - name: logstash
+        imagePullPolicy: Never
+        image: logstash.local:latest
+        ports:
+          - containerPort: 80
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash-service
+spec:
+  type: ClusterIP
+  selector:
+    app: logstash
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5044
