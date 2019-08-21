@@ -20,6 +20,11 @@ kubectl get/describe
 ### Check the pod for any logs indicating it's at fault
 kubectl logs
 
+### Use the dnsutils and busybox images
+
+kubectl run -i --tty dnsutils --generator=run-pod/v1 --image=tutum/dnsutils -- /bin/sh
+kubectl run -i --tty busybox --generator=run-pod/v1 --image=busybox -- /bin/sh
+
 ### Check pod and service through proxy
 kubectl proxy
 curl https://<proxy_addr>/api/v1/namespaces/<namespace>/services/<service>/proxy

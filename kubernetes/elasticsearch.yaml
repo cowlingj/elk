@@ -1,11 +1,13 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: elasticsearch
 spec:
   selector:
     matchLabels:
       app: elasticsearch
+  serviceName: elasticsearch-service
+  replicas: 2
   template:
     metadata:
       labels:
@@ -15,29 +17,33 @@ spec:
       - name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:7.3.0
         env:
-        - name: discovery.type
-          value: single-node
+          - name: discovery.seed_hosts
+            value: "elasticsearch-0.elasticsearch-service:9300,elasticsearch-1.elasticsearch-service:9300"
+          - name: cluster.initial_master_nodes
+            value: elasticsearch-0,elasticsearch-1
+          - name: ES_JAVA_OPTS
+            value: "-Xms256M -Xmx256M"
         ports:
         - containerPort: 9200
           name: http
           protocol: TCP
+        - containerPort: 9300
+          name: nodes
+          protocol: TCP
         resources:
           limits:
             cpu: 500m
-            memory: 2Gi
+            memory: 1Gi
           requests:
             cpu: 500m
-            memory: 2Gi
+            memory: 1Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: elasticsearch-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: elasticsearch
-  ports:
-    - nodePort: 30001
-      port: 80
-      targetPort: 9200
+  clusterIP: None
